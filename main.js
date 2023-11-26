@@ -1,29 +1,18 @@
-// import "./style.css";
 import { renderPage, routerNa } from "./src/Utils/Router.js";
 import { App } from "./src/App.js";
-// import { Error } from "./src/Pages/Error.js";
 
 const { root: roots, DefaultLayout } = App();
 const app = document.querySelector("#app");
-function render(component, DefaultLayout, params = null) {
-  let stringHtml = DefaultLayout;
-  const pattern = /{body}/;
 
-  if (params) {
-    app.innerHTML = stringHtml.replace(pattern, component(params));
-  } else {
-    console.log((app.innerHTML = stringHtml.replace(pattern, component())));
-  }
-}
-roots.forEach(({ path, component }, _) => {
-  routerNa.on(path, (params) => {
-    render(component, DefaultLayout, params);
-  });
+const render = (component, DefaultLayout, params = null) => {
+  app.innerHTML = DefaultLayout.replace(
+    /{body}/,
+    params ? component(params) : component()
+  );
+};
+
+roots.forEach(({ path, component }) => {
+  routerNa.on(path, (params) => render(component, DefaultLayout, params));
 });
 
-routerNa.resolve();
-routerNa
-  .notFound(() => {
-    app.innerHTML = Error();
-  })
-  .resolve();
+routerNa.notFound(() => (app.innerHTML = Error())).resolve();
